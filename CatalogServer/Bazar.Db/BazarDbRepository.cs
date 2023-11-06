@@ -58,7 +58,7 @@ namespace CatalogServer.Bazar.Db
 
         private void WriteCsvFile(List<Book> books)
         {
-            using (var writer = new StreamWriter("book.csv"))
+            using (var writer = new StreamWriter("books.csv"))
             using (
                 var csv = new CsvWriter(writer, new CsvConfiguration(CultureInfo.InvariantCulture))
             )
