@@ -9,6 +9,17 @@ namespace CatalogServer.Controllers
     {
         BazarDbRepository bazarDbRepository = new BazarDbRepository();
 
+        [HttpPut("Book/{bookId}")]
+        public ActionResult<Book> EditBookStock(
+            [FromRoute] int bookId,
+            [FromBody] StockUpdateDTO StockDTO
+        )
+        {
+            var book = bazarDbRepository.EditStock(bookId, StockDTO.Stock);
+
+            return Ok(book);
+        }
+
         [HttpGet("/Book/{BookId}")]
         public ActionResult<Book> GetBookById(int BookId)
         {
