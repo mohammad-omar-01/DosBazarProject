@@ -1,9 +1,7 @@
 ﻿using CatalogServer.Models;
 using CsvHelper;
 using CsvHelper.Configuration;
-using Microsoft.OpenApi.Extensions;
 using System.Globalization;
-using System.Net;
 
 namespace CatalogServer.Bazar.Db
 {
