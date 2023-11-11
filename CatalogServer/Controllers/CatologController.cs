@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CatalogServer.Controllers
 {
     [ApiController]
-    public class CatologController : Controller
+    public class CatologController : ControllerBase
     {
         BazarDbRepository bazarDbRepository = new BazarDbRepository();
 
@@ -15,6 +15,7 @@ namespace CatalogServer.Controllers
             [FromBody] StockUpdateDTO StockDTO
         )
         {
+            Console.WriteLine(bookId);
             var book = bazarDbRepository.EditStock(bookId, StockDTO.Stock);
 
             return Ok(book);
@@ -23,6 +24,7 @@ namespace CatalogServer.Controllers
         [HttpGet("/Book/{BookId}")]
         public ActionResult<Book> GetBookById(int BookId)
         {
+            Console.WriteLine(BookId);
             var book = bazarDbRepository.RetriveBookById(BookId);
             if (book == null)
             {
