@@ -2,9 +2,7 @@
 {
     public class BookTopicSearchResult
     {
-
-        public string Title { get; set; } = string.Empty;
-        public int ItemNumber { get; set; }
-
+        public string title { get; set; } = string.Empty;
+        public int price { get; set; }
     }
 }

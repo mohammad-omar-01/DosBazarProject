@@ -1,5 +1,6 @@
 ﻿using BazarUi.Models;
 using BazarUi.Utilties;
+using System.Text.Json;
 
 namespace BazarUi
 {
@@ -9,7 +10,7 @@ namespace BazarUi
         {
             Console.WriteLine($"Searching for items related to topic: {topic}");
             var path = Environment.GetEnvironmentVariable("CATALOGURL");
-            path = path + "/Search" + topic;
+            path = path + "/Search/" + topic;
             string jsonResponse = GetJsonResponseFromApi(path, topic);
 
             if (!string.IsNullOrEmpty(jsonResponse))
@@ -55,7 +56,7 @@ namespace BazarUi
                 Console.WriteLine("Search Results:");
                 foreach (var result in results)
                 {
-                    Console.WriteLine($"Title: {result.Title}, Item Number: {result.ItemNumber}");
+                    Console.WriteLine($"Title: {result.title}, Item Price: {result.price}");
                 }
             }
             else
@@ -64,17 +65,15 @@ namespace BazarUi
             }
         }
 
-        private void DisplaySearchResults(List<BookSearchResult> results)
+        private void DisplaySearchResults(BookSearchResult result)
         {
-            if (results.Count > 0)
+            if (result != null)
             {
                 Console.WriteLine("Search Results:");
-                foreach (var result in results)
-                {
-                    Console.WriteLine(
-                        $"Title: {result.Title}, Item Topic: {result.Topic}, Item Price : {result.Price}, Stock :{result.CopiesInStock} "
-                    );
-                }
+
+                Console.WriteLine(
+                    $"Title: {result.title}\nItem Topic: {result.category}\nItem Price : {result.price}\nStock :{result.stock}\n"
+                );
             }
             else
             {
@@ -87,26 +86,41 @@ namespace BazarUi
             Console.WriteLine($"Fetching info for item number: {itemNumber}");
             Console.WriteLine($"Searching for items related to topic: {itemNumber}");
             var path = Environment.GetEnvironmentVariable("CATALOGURL");
-            path = path + "/Book" + itemNumber;
+            path = path + "/Book/" + itemNumber;
             string jsonResponse = GetJsonResponseFromApi(path);
 
             if (!string.IsNullOrEmpty(jsonResponse))
             {
-                List<BookSearchResult> searchResults =
-                    JsonUtility.DeserializeSearchResults<BookSearchResult>(jsonResponse);
+                BookSearchResult searchResults =
+                    JsonUtility.DeserializeSearchResultsForItem<BookSearchResult>(jsonResponse);
                 DisplaySearchResults(searchResults);
             }
             else
             {
                 Console.WriteLine("No results found.");
             }
-            // Implement your info logic here
         }
 
-        public void Purchase(int itemNumber)
+        public async void Purchase(int itemNumber)
         {
-            Console.WriteLine($"Purchasing item with item number: {itemNumber}");
-            // Implement your purchase logic here
+            var path =
+                Environment.GetEnvironmentVariable("ORDERURL") + "/api/Order/Book/" + itemNumber;
+            HttpClient client = new HttpClient();
+            var content = new StringContent("", System.Text.Encoding.UTF8, "application/json");
+            HttpResponseMessage responseText = await client.PostAsync(path, content);
+            if (responseText.IsSuccessStatusCode)
+            {
+                var result = responseText.Content.ReadAsStringAsync();
+                var bookreturn = JsonUtility.DeserializeSearchResultsForItem<BookSearchResult>(
+                    result.Result
+                );
+
+                Console.WriteLine($"\n Thank You for Buying {bookreturn.title}");
+            }
+            else
+            {
+                Console.WriteLine($"\n Soory Book is Not avaliable");
+            }
         }
     }
 }
