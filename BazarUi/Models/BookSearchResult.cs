@@ -2,10 +2,10 @@
 {
     public class BookSearchResult
     {
-        public string Title { get; set; } = string.Empty;
-        public string Topic { get; set; } = string.Empty;
-        public int CopiesInStock { get; set; }
-        public int Price { get; set; }
-
+        public int bookId { get; set; }
+        public string title { get; set; } = string.Empty;
+        public int stock { get; set; }
+        public int price { get; set; }
+        public string category { get; set; } = string.Empty;
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using BazarUi.Models;
 
 namespace BazarUi.Utilties
 {
@@ -20,6 +19,22 @@ namespace BazarUi.Utilties
 
             return results;
         }
-    }
 
+        public static T DeserializeSearchResultsForItem<T>(string json)
+        {
+            T results;
+
+            try
+            {
+                results = JsonSerializer.Deserialize<T>(json);
+                return results;
+            }
+            catch (JsonException ex)
+            {
+                Console.WriteLine($"Error deserializing JSON: {ex.Message}");
+            }
+
+            return default;
+        }
+    }
 }
