@@ -7,14 +7,16 @@ namespace BazarUi
     {
         public void Search(string topic)
         {
-
             Console.WriteLine($"Searching for items related to topic: {topic}");
-            string jsonResponse = GetJsonResponseFromApi(topic);
+            var path = Environment.GetEnvironmentVariable("CATALOGURL");
+            path = path + "/Search" + topic;
+            string jsonResponse = GetJsonResponseFromApi(path, topic);
 
             if (!string.IsNullOrEmpty(jsonResponse))
             {
-                List<BookTopicSearchResult> searchResults = JsonUtility.DeserializeSearchResults<BookTopicSearchResult>(jsonResponse);
-               DisplaySearchResultsByTopic(searchResults);
+                List<BookTopicSearchResult> searchResults =
+                    JsonUtility.DeserializeSearchResults<BookTopicSearchResult>(jsonResponse);
+                DisplaySearchResultsByTopic(searchResults);
             }
             else
             {
@@ -22,15 +24,28 @@ namespace BazarUi
             }
         }
 
-        private string GetJsonResponseFromApi(string topic)
+        private string GetJsonResponseFromApi(string path, string topic)
         {
-            string sampleJsonResponse = "[{\"Title\":\"Book A\",\"ItemNumber\":1},{\"Title\":\"Book B\",\"ItemNumber\":2}]";
-            return sampleJsonResponse;
+            var socketsHandler = new SocketsHttpHandler
+            {
+                PooledConnectionLifetime = TimeSpan.FromMinutes(2)
+            };
+
+            HttpClient httpClient = new HttpClient(socketsHandler);
+            var result = httpClient.GetAsync(path).Result;
+            return result.Content.ReadAsStringAsync().Result;
         }
-        private string GetJsonResponseFromApi(int itemNumber)
+
+        private string GetJsonResponseFromApi(string path)
         {
-            string sampleJsonResponse = "[{\"Title\":\"Book A\",\"Topic\":\"distributed systems\",\"CopiesInStock\":3,\"Price\":15},{\"Title\":\"Book C\",\"Topic\":\"distributed systems\",\"CopiesInStock\":13,\"Price\":150}]";
-            return sampleJsonResponse;
+            var socketsHandler = new SocketsHttpHandler
+            {
+                PooledConnectionLifetime = TimeSpan.FromMinutes(2)
+            };
+
+            HttpClient httpClient = new HttpClient(socketsHandler);
+            var result = httpClient.GetAsync(path).Result;
+            return result.Content.ReadAsStringAsync().Result;
         }
 
         private void DisplaySearchResultsByTopic(List<BookTopicSearchResult> results)
@@ -48,6 +63,7 @@ namespace BazarUi
                 Console.WriteLine("No results found.");
             }
         }
+
         private void DisplaySearchResults(List<BookSearchResult> results)
         {
             if (results.Count > 0)
@@ -55,7 +71,9 @@ namespace BazarUi
                 Console.WriteLine("Search Results:");
                 foreach (var result in results)
                 {
-                    Console.WriteLine($"Title: {result.Title}, Item Topic: {result.Topic}, Item Price : {result.Price}, Stock :{result.CopiesInStock} ");
+                    Console.WriteLine(
+                        $"Title: {result.Title}, Item Topic: {result.Topic}, Item Price : {result.Price}, Stock :{result.CopiesInStock} "
+                    );
                 }
             }
             else
@@ -64,18 +82,18 @@ namespace BazarUi
             }
         }
 
-
-
-
         public void Info(int itemNumber)
         {
             Console.WriteLine($"Fetching info for item number: {itemNumber}");
             Console.WriteLine($"Searching for items related to topic: {itemNumber}");
-            string jsonResponse = GetJsonResponseFromApi(itemNumber);
+            var path = Environment.GetEnvironmentVariable("CATALOGURL");
+            path = path + "/Book" + itemNumber;
+            string jsonResponse = GetJsonResponseFromApi(path);
 
             if (!string.IsNullOrEmpty(jsonResponse))
             {
-                List<BookSearchResult> searchResults = JsonUtility.DeserializeSearchResults<BookSearchResult>(jsonResponse);
+                List<BookSearchResult> searchResults =
+                    JsonUtility.DeserializeSearchResults<BookSearchResult>(jsonResponse);
                 DisplaySearchResults(searchResults);
             }
             else
@@ -90,8 +108,5 @@ namespace BazarUi
             Console.WriteLine($"Purchasing item with item number: {itemNumber}");
             // Implement your purchase logic here
         }
-
-
-
     }
 }
